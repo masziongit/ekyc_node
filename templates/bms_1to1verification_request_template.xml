@@ -1,0 +1,53 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> 
+   <soapenv:Body> 
+      <SubmitRequest xmlns="http://www.nec.com.sg"> 
+         <submitMsg> 
+            <RequestID>001</RequestID> 
+            <RequestMode>ONLINE</RequestMode> 
+            <Operations> 
+               <Operation> 
+                  <ReferenceID>FRVERIFY_TEST</ReferenceID>
+                  <datasource> 
+                     <DataSource> 
+                        <source>BMS</source> 
+                     </DataSource> 
+                  </datasource> 
+                  <BiometricDataIds> 
+                     <BiometricDataIdLength>1</BiometricDataIdLength> 
+                     <BiometricDataIds> 
+                        <anyType xsi:type="xsd:string">1</anyType>
+                     </BiometricDataIds> 
+                  </BiometricDataIds> 
+                  <Criterias> 
+                     <MaxCandidates>10</MaxCandidates> 
+                  </Criterias> 
+                  <OperationType>FRVERIFY</OperationType> 
+                  <TimeOut>60000</TimeOut> 
+               </Operation> 
+            </Operations> 
+            <AbstractBiometricData>             
+               <Abstractbiometricdata>
+                  <BiometricType>facial</BiometricType>
+                  <BiometricDataId>1</BiometricDataId>
+                  <BiometricData xsi:type="ns1:FacialData" xmlns:ns1="http://www.nec.com.sg">
+                     <ImageFormat>JPG</ImageFormat>
+                     <ImageLength></ImageLength>
+                     <ImageData></ImageData>                    
+                     <Pos>1</Pos>
+                  </BiometricData>
+               </Abstractbiometricdata>           
+               <Abstractbiometricdata>
+                  <BiometricType>facial</BiometricType>
+                  <BiometricDataId>1</BiometricDataId>
+                  <BiometricData xsi:type="ns1:FacialData" xmlns:ns1="http://www.nec.com.sg">
+                     <ImageFormat>JPG</ImageFormat>
+                     <ImageLength></ImageLength>
+                     <ImageData></ImageData>                    
+                     <Pos>1</Pos>
+                  </BiometricData>
+               </Abstractbiometricdata>			   
+            </AbstractBiometricData> 
+         </submitMsg> 
+      </SubmitRequest> 
+   </soapenv:Body> 
+</soapenv:Envelope>

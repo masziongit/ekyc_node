@@ -1,0 +1,12 @@
+.DS_Store
+.idea
+certs/
+logs/
+node_modules/
+.audit.json
+eng.traineddata
+env
+
+*.tar.gz
+nohup.err
+nohup.out
