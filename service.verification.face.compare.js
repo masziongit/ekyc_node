@@ -160,15 +160,14 @@ module.exports = (json) => {
              logger.info('Secondary photo has been saved for rquid: ' + rquid);
          });
 
-         await db('verificationHistoryData').insert(historyData)
+         await db('verificationHistoryData').insert(historyData).returning('*')
              .catch((err) => {
                  logger.error('Found internal error when saving verification data for rquid: ' + rquid);
-                 logger.error(err.toString());
+                 logger.error(err);
                  res.status(500);
                  res.json(jsonErr)
-                 throw err
              })
-             .then(() => {
+             .then((rs) => {
                  logger.info('1-to-1 Face verification history has been saved for rquid: ' + rquid);
                  // send response back to client
                  var json = {
@@ -176,13 +175,12 @@ module.exports = (json) => {
                      statusCode: successStatus,
                      statusDesc: "Success",
                      remark: "Verification successful",
-                     verificationRefId: verificationRefId,
-                     resultCode: resultCode,
-                     resultDesc: resultDesc,
-                     score: numTotalScore,
-                     idp: idp
+                     verificationRefId: rs[0].verificationRefId,
+                     resultCode: rs[0].resultCode,
+                     resultDesc: rs[0].resultDesc,
+                     score: rs[0].totalScore,
+                     idp: rs[0].idp
                  };
-                 logger.debug('Received verification request: ' + JSON.stringify(json));
                  res.send(json);
              });
 

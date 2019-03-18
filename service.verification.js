@@ -192,7 +192,7 @@ exports.oneToOne = (json) => {
                 var totalScore = xmlResponse('totalscore').text();
 
                 // process total score
-                var numTotalScore = parseInt(totalScore);
+                var numTotalScore = parseFloat(totalScore).toFixed(2);
                 var resultCode;
                 var resultDesc;
                 var idp;
@@ -233,7 +233,7 @@ exports.oneToOne = (json) => {
                     .insert(primaryPhoto)
                     .catch((err) => {
                         logger.error('Found internal error when saving primary photo for rquid: ' + rquid);
-                        logger.error(err.toString());
+                        logger.error(err);
                     }).then(() => {
                         logger.info('Primary photo has been saved for rquid: ' + rquid);
                     });
@@ -242,7 +242,7 @@ exports.oneToOne = (json) => {
                     .insert(secondaryPhoto)
                     .catch((err) => {
                         logger.error('Found internal error when saving secondary photo for rquid: ' + rquid);
-                        logger.error(err.toString());
+                        logger.error(err);
 
                     }).then(()=>{
                     logger.info('Secondary photo has been saved for rquid: ' + rquid);
@@ -267,14 +267,15 @@ exports.oneToOne = (json) => {
                     idp: idp,
                     channel: channel
                 };
-                await db('verificationHistoryData').insert(historyData)
+
+                await db('verificationHistoryData').insert(historyData).returning('*')
                     .catch((err) => {
                         logger.error('Found internal error when saving verification data for rquid: ' + rquid);
-                        logger.error(err.toString());
+                        logger.error(err);
                         res.status(500);
                         res.json(jsonErr)
                     })
-                    .then(() => {
+                    .then((rs) => {
                         logger.info('1-to-1 Face verification history has been saved for rquid: ' + rquid);
                         // send response back to client
                         var json = {
@@ -282,11 +283,11 @@ exports.oneToOne = (json) => {
                             statusCode: successStatus,
                             statusDesc: "Success",
                             remark: "Verification successful",
-                            verificationRefId: verificationRefId,
-                            resultCode: resultCode,
-                            resultDesc: resultDesc,
-                            score: parseFloat(totalScore).toFixed(2),
-                            idp: idp
+                            verificationRefId: rs[0].verificationRefId,
+                            resultCode: rs[0].resultCode,
+                            resultDesc: rs[0].resultDesc,
+                            score: rs[0].totalScore,
+                            idp: rs[0].idp
                         };
                         res.send(json);
                     });
