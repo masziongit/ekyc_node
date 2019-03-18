@@ -7,21 +7,25 @@
 const express = require('express');
 const fs = require('fs');
 const bodyParser = require('body-parser');
-const xml2js = require('xml2js'); // may not need
+// const xml2js = require('xml2js'); // may not need
 const cheerio = require('cheerio');
-const uuidv4 = require('uuid/v4');
-const mongoose = require('mongoose');
+// const uuidv4 = require('uuid/v4');
+// const mongoose = require('mongoose');
 const util = require('./util.js');
 const request = require('request');
 const path = require('path');
 
 // init https
 const https = require('https');
-var options = {
-    ca: fs.readFileSync('./certs/tmb-root-ca.cer'),
-    cert: fs.readFileSync('./certs/ekyc.cer'),
-    key: fs.readFileSync('./certs/ekyc.key')
+let options
+
+
+options = {
+    ca: fs.readFileSync(process.env.SEVER_CA),
+    cert: fs.readFileSync(process.env.SEVER_CERT),
+    key: fs.readFileSync(process.env.SEVER_KEY)
 };
+
 
 // init server
 var app = express();
@@ -64,13 +68,18 @@ var logger = winston.createLogger({
     ),
     transports: [
         transport
-        ,
-        new (winston.transports.Console)({
-            json: true,
-            stringify: (obj) => JSON.stringify(obj),
-        })
     ]
 });
+
+if (process.env.LOG_LEVEL === 'debug'){
+    logger.add(new (winston.transports.Console)({
+        json: true,
+        stringify: (obj) => JSON.stringify(obj),
+    }))
+}
+
+
+
 
 //  variable declaration
 var availableChannels = ['tmb', 'scb', 'kbank', 'ktc', 'bbl', 'bay', 'uob'];    // not being used for now
