@@ -4,7 +4,9 @@
  */
 
 // load dependencies
-const express = require('express');
+const express = require('express'),
+    expressWinston = require('express-winston');
+
 const fs = require('fs');
 const bodyParser = require('body-parser');
 // const xml2js = require('xml2js'); // may not need
@@ -40,6 +42,8 @@ app.use(bodyParser.json({
 var winston = require('winston');
 require('winston-daily-rotate-file');
 
+let transports = []
+
 var transport = new (winston.transports.DailyRotateFile)({
     filename: './logs/application-%DATE%.log',
     //datePattern: 'YYYY-MM-DD-HH',
@@ -52,6 +56,20 @@ var transport = new (winston.transports.DailyRotateFile)({
 }).on('rotate', function (oldFilename, newFilename) {
     // do something fun
 });
+
+transports.push(transport)
+
+if (process.env.LOG_LEVEL === 'debug'){
+    // logger.add(new (winston.transports.Console)({
+    //     json: true,
+    //     stringify: (obj) => JSON.stringify(obj),
+    // }))
+
+    transports.push(new (winston.transports.Console)({
+            json: true,
+            stringify: (obj) => JSON.stringify(obj),
+        }))
+}
 
 const {splat, combine, timestamp, printf} = winston.format;
 
@@ -66,20 +84,24 @@ var logger = winston.createLogger({
         splat(),
         myFormat
     ),
-    transports: [
-        transport
-    ]
+    transports
 });
+let restLog = expressWinston.logger({
+    format: combine(
+        timestamp(),
+        splat(),
+        myFormat
+    ),
+    transports,
+    meta: false, // optional: control whether you want to log the meta data about the request (default to true)
+    msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
+    expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+    colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+    ignoreRoute: function (req, res) { return false; } // optional: allows to skip some log messages based on request and/or response
+})
 
-if (process.env.LOG_LEVEL === 'debug'){
-    logger.add(new (winston.transports.Console)({
-        json: true,
-        stringify: (obj) => JSON.stringify(obj),
-    }))
-}
 
-
-
+app.use(restLog);
 
 //  variable declaration
 var availableChannels = ['tmb', 'scb', 'kbank', 'ktc', 'bbl', 'bay', 'uob'];    // not being used for now
@@ -90,6 +112,9 @@ var db = require('./database/dbconnection').db
 setInterval(function () {
     db.raw('SELECT 1 FROM DUAL').then(function (resp) {
         console.log(util.dateNow() + ` checking database connection ${JSON.stringify(resp)}`);
+    }).catch(err=>{
+        logger.error(err)
+        throw err
     });
 }, 10000);
 
@@ -195,64 +220,6 @@ app.post('/passport_verification', (req, res) => {
     res.sendFile(path.join(__dirname, 'sampleMessages', 'bms_responsePayload.xml'));
 
 });
-
-let prospectUri = process.env.PROSPECT_URI;
-
-app.post('/prospect_profile', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_profile', method: 'POST', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
-app.post('/prospect_profile/search', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_profile/search', method: 'POST', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
-app.get('/prospect_profile/:id', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_profile/' + req.params.id, method: 'GET', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
-app.put('/prospect_profile/:id', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_profile/' + req.params.id, method: 'PUT', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
-app.delete('/prospect_profile/:id', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_profile/' + req.params.id, method: 'DELETE', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
-
-app.post('/prospect_idp_log', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_idp_log', method: 'POST', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
-app.get('/prospect_idp_log/:id', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_idp_log/' + req.params.id, method: 'GET', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
-app.put('/prospect_idp_log/:id', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_idp_log/' + req.params.id, method: 'PUT', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
-app.delete('/prospect_idp_log/:id', (req, res) => {
-    var options = {uri: prospectUri + 'prospect_idp_log/' + req.params.id, method: 'DELETE', json: req.body};
-    request(options, (error, response, body) => {
-        res.status(response.statusCode).json(body);
-    })
-})
 
 // START eKYC server !!!
 var start = () => {

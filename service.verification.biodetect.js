@@ -12,7 +12,7 @@ module.exports = (json) => {
     let req = json.req;
     let res = json.res;
 
-    logger.debug('Received verification request: ' + JSON.stringify(req.body));
+
 
     let rquid = req.body.rquid
     let documentId = req.body.documentId
@@ -41,7 +41,9 @@ module.exports = (json) => {
 
 }
 
-const verification = (req,logger)=>{
+const verification = module.exports.verification = (req,logger)=>{
+
+    logger.debug('Received verification request: ' + JSON.stringify(req.body));
 
     let rp = require('request-promise');
 
@@ -102,3 +104,4 @@ const badRequest = (logger,rquid,res)=>{
         remark: "Missing input(s)"
     });
 }
+

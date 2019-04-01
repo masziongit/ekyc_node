@@ -5,6 +5,7 @@ const util = require('./util.js');
 const successStatus = '1000';
 const errorStatus = '1999';
 const uuidv4 = require('uuid/v4');
+const biodetect = require('./service.verification.biodetect')
 
 const faceVerificationUrl = process.env.FACE_COMPARE;
 
@@ -16,20 +17,19 @@ module.exports = (json) => {
     let db = json.db;
 
 
-
     logger.debug('Received verification request: ' + JSON.stringify(req.body));
 
     let rquid = req.body.rquid
 
-    if (util.isUndefineNullBlank(rquid)                        ||
-        util.isUndefineNullBlank(req.body.documentId)                   ||
-        util.isUndefineNullBlank(req.body.documentIdType)               ||
-        util.isUndefineNullBlank(req.body.verificationMethod)           ||
-        util.isUndefineNullBlank(req.body.primaryBiometricData)         ||
-        util.isUndefineNullBlank(req.body.primaryBiometricDataLength)   ||
-        util.isUndefineNullBlank(req.body.primaryBiometricDataFormat)   ||
-        util.isUndefineNullBlank(req.body.primaryBiometricDataSource)   ||
-        util.isUndefineNullBlank(req.body.secondaryBiometricData)       ||
+    if (util.isUndefineNullBlank(rquid) ||
+        util.isUndefineNullBlank(req.body.documentId) ||
+        util.isUndefineNullBlank(req.body.documentIdType) ||
+        util.isUndefineNullBlank(req.body.verificationMethod) ||
+        util.isUndefineNullBlank(req.body.primaryBiometricData) ||
+        util.isUndefineNullBlank(req.body.primaryBiometricDataLength) ||
+        util.isUndefineNullBlank(req.body.primaryBiometricDataFormat) ||
+        util.isUndefineNullBlank(req.body.primaryBiometricDataSource) ||
+        util.isUndefineNullBlank(req.body.secondaryBiometricData) ||
         util.isUndefineNullBlank(req.body.secondaryBiometricDataLength) ||
         util.isUndefineNullBlank(req.body.secondaryBiometricDataMethod) ||
         util.isUndefineNullBlank(req.body.secondaryBiometricDataFormat) ||
@@ -37,7 +37,7 @@ module.exports = (json) => {
         util.isUndefineNullBlank(req.body.channel)
     ) {
 
-        badRequest(logger,rquid,res)
+        badRequest(logger, rquid, res)
         return;
     }
 
@@ -65,7 +65,7 @@ module.exports = (json) => {
         biometricRefId: secondaryPhotoRefId,
         documentId: req.body.documentId,
         documentIdType: req.body.documentIdType,
-        biometricData:req.body.secondaryBiometricData,
+        biometricData: req.body.secondaryBiometricData,
         biometricDataFormat: req.body.secondaryBiometricDataFormat,
         biometricDataMethod: req.body.secondaryBiometricDataMethod,
         biometricDataSource: req.body.secondaryBiometricDataSource,
@@ -81,118 +81,142 @@ module.exports = (json) => {
         remark: "Internal server error"
     }
 
-     verification(req,logger).then(async body => {
+    logger.info('Check liveness Secondary BiometricData')
+    let bioInput = {
+        body:{
+            rquid: rquid,
+            documentId: secondaryPhoto.documentId,
+            image: {
+                app_id: "com.paic.xface - TWDW",
+                "content-type": secondaryPhoto.biometricDataFormat,
+                data: secondaryPhoto.biometricData
+            }
+        }
+    }
 
-         let resultCode
-         let numTotalScore = (body.similarity*100).toFixed(2)
-         let resultDesc
-         let idp
+    biodetect.verification(bioInput, logger)
+        .catch(err => {
+            logger.error('Received verification response: ' + JSON.stringify(err));
+            res.status(500).json(err)
+        }).then(bioRes => {
 
-         if(thaiIdValidator(req.body.documentId)){
-             // if CID
-             logger.info("ID provided for verification is CID, rquid: " + rquid);
-             if (numTotalScore >= 6000) {
-                 resultCode = "1";
-                 resultDesc = "Pass";
-                 idp = "0";
-             } else if (numTotalScore >= 3000 && numTotalScore < 6000) {
-                 resultCode = "0";
-                 resultDesc = "Pass with condition";
-                 idp = "1";
-             } else {
-                 resultCode = "-1";
-                 resultDesc = "Fail";
-                 idp = "0";
-             }
-         }else{
-             if (numTotalScore >= 6500) {
-                 resultCode = "1";
-                 resultDesc = "Pass";
-                 idp = "0";
-             } else if (numTotalScore >= 3500 && numTotalScore < 6500) {
-                 resultCode = "0";
-                 resultDesc = "Pass with condition";
-                 idp = "1";
-             } else {
-                 resultCode = "-1";
-                 resultDesc = "Fail";
-                 idp = "0";
-             }
-         }
+        verification(req, logger).then(async body => {
 
-         // record 1-to-1 verification
-         let verificationRefId = uuidv4();
-         let historyData = {
-             verificationRefId: verificationRefId,
-             primaryBiometricDataRefId: primaryPhoto.biometricRefId,
-             secondaryBiometricDataRefId: secondaryPhoto.biometricRefId,
-             primaryBiometricDataMethod: req.body.primaryBiometricDataMethod,
-             secondaryBiometricDataMethod: req.body.secondaryBiometricDataMethod,
-             documentId: req.body.documentId,
-             documentIdType: req.body.documentIdType,
-             verificationMethod: req.body.verificationMethod,
-             timestamp: currentUnixTime,
-             date: currentDate,
-             totalScore: numTotalScore,
-             resultCode: resultCode,
-             resultDesc: resultDesc,
-             idp: idp,
-             channel: req.body.channel
-         }
+            let resultCode
+            let numTotalScore = (body.similarity * 100).toFixed(2)
+            let resultDesc
+            let idp
 
-         await db('biometricData')
-             .insert(primaryPhoto)
-             .catch((err) => {
-                 logger.error('Found internal error when saving primary photo for rquid: ' + rquid);
-                 logger.error(err.toString());
-                 throw err
-             }).then(() => {
-                 logger.info('Primary photo has been saved for rquid: ' + rquid);
-             })
+            numTotalScore = (bioRes.errorcode == '0')?numTotalScore : 0
 
-         await  db('biometricData')
-             .insert(secondaryPhoto)
-             .catch((err) => {
-                 logger.error('Found internal error when saving secondary photo for rquid: ' + rquid);
-                 logger.error(err.toString());
-                 throw err
-             }).then(()=>{
-             logger.info('Secondary photo has been saved for rquid: ' + rquid);
-         });
+            if (thaiIdValidator(req.body.documentId)) {
+                // if CID
+                logger.info("ID provided for verification is CID, rquid: " + rquid);
+                if (numTotalScore >= 6000) {
+                    resultCode = "1";
+                    resultDesc = "Pass";
+                    idp = "0";
+                } else if (numTotalScore >= 3000 && numTotalScore < 6000) {
+                    resultCode = "0";
+                    resultDesc = "Pass with condition";
+                    idp = "1";
+                } else {
+                    resultCode = "-1";
+                    resultDesc = "Fail";
+                    idp = "0";
+                }
+            } else {
+                if (numTotalScore >= 6500) {
+                    resultCode = "1";
+                    resultDesc = "Pass";
+                    idp = "0";
+                } else if (numTotalScore >= 3500 && numTotalScore < 6500) {
+                    resultCode = "0";
+                    resultDesc = "Pass with condition";
+                    idp = "1";
+                } else {
+                    resultCode = "-1";
+                    resultDesc = "Fail";
+                    idp = "0";
+                }
+            }
 
-         await db('verificationHistoryData').insert(historyData).returning('*')
-             .catch((err) => {
-                 logger.error('Found internal error when saving verification data for rquid: ' + rquid);
-                 logger.error(err);
-                 res.status(500);
-                 res.json(jsonErr)
-             })
-             .then((rs) => {
-                 logger.info('1-to-1 Face verification history has been saved for rquid: ' + rquid);
-                 // send response back to client
-                 var json = {
-                     rquid: rquid,
-                     statusCode: successStatus,
-                     statusDesc: "Success",
-                     remark: "Verification successful",
-                     verificationRefId: rs[0].verificationRefId,
-                     resultCode: rs[0].resultCode,
-                     resultDesc: rs[0].resultDesc,
-                     score: rs[0].totalScore,
-                     idp: rs[0].idp
-                 };
-                 res.send(json);
-             });
+            // record 1-to-1 verification
+            let verificationRefId = uuidv4();
+            let historyData = {
+                verificationRefId: verificationRefId,
+                primaryBiometricDataRefId: primaryPhoto.biometricRefId,
+                secondaryBiometricDataRefId: secondaryPhoto.biometricRefId,
+                primaryBiometricDataMethod: req.body.primaryBiometricDataMethod,
+                secondaryBiometricDataMethod: req.body.secondaryBiometricDataMethod,
+                documentId: req.body.documentId,
+                documentIdType: req.body.documentIdType,
+                verificationMethod: req.body.verificationMethod,
+                timestamp: currentUnixTime,
+                date: currentDate,
+                totalScore: numTotalScore,
+                resultCode: resultCode,
+                resultDesc: resultDesc,
+                idp: idp,
+                channel: req.body.channel
+            }
 
-     }).catch(error=>{
-         logger.error('Received verification request: ' + JSON.stringify(jsonErr));
-         res.status(500).json(jsonErr)
-         throw error
-     })
+            await db('biometricData')
+                .insert(primaryPhoto)
+                .catch((err) => {
+                    logger.error('Found internal error when saving primary photo for rquid: ' + rquid);
+                    logger.error(err.toString());
+                    throw err
+                }).then(() => {
+                    logger.info('Primary photo has been saved for rquid: ' + rquid);
+                })
 
+            await  db('biometricData')
+                .insert(secondaryPhoto)
+                .catch((err) => {
+                    logger.error('Found internal error when saving secondary photo for rquid: ' + rquid);
+                    logger.error(err.toString());
+                    throw err
+                }).then(() => {
+                    logger.info('Secondary photo has been saved for rquid: ' + rquid);
+                });
+
+            await db('verificationHistoryData').insert(historyData).returning('*')
+                .catch((err) => {
+                    logger.error('Found internal error when saving verification data for rquid: ' + rquid);
+                    logger.error(err);
+                    res.status(500);
+                    res.json(jsonErr)
+                    throw err
+                })
+                .then((rs) => {
+                    logger.info('1-to-1 Face verification history has been saved for rquid: ' + rquid);
+                    // send response back to client
+                    var json = {
+                        rquid: rquid,
+                        statusCode: successStatus,
+                        statusDesc: "Success",
+                        remark: "Verification successful",
+                        verificationRefId: rs[0].verificationRefId,
+                        resultCode: rs[0].resultCode,
+                        resultDesc: rs[0].resultDesc,
+                        score: rs[0].totalScore,
+                        idp: rs[0].idp
+                    };
+                    res.send(json);
+                });
+
+        }).catch(error => {
+            logger.error('Received verification request: ' + JSON.stringify(jsonErr));
+            res.status(500).json(jsonErr)
+            throw error
+        })
+
+
+    })
 }
 
-const badRequest = (logger,rquid,res)=>{
+const badRequest = (logger, rquid, res) => {
     logger.info('Bad request for rquid: ' + rquid);
     res.statusMessage = "Bad request";
     res.status(400);
@@ -204,8 +228,7 @@ const badRequest = (logger,rquid,res)=>{
 }
 
 
-
-const verification = (req,logger)=>{
+const verification = (req, logger) => {
 
     let rp = require('request-promise');
 
@@ -213,37 +236,37 @@ const verification = (req,logger)=>{
     let shexData = Buffer.from(req.body.secondaryBiometricData, 'utf8').toString('hex').toUpperCase();
 
     const timestamp = new Date().getTime()
-    const none  =  Math.floor(Math.random() * 9999999) ;
-    const sign = util.signature(timestamp+'',none+'')
+    const none = Math.floor(Math.random() * 9999999);
+    const sign = util.signature(timestamp + '', none + '')
 
     let option = {
         method: 'POST',
         uri: faceVerificationUrl,
         headers: {
-            "Content-Type":"application/json",
+            "Content-Type": "application/json",
             "x-bi-boundid": "com.paic.xface-test",
-            "x-bi-timestamp":timestamp+"",
-            "x-bi-none":none+"",
-            "Authorization" : sign
+            "x-bi-timestamp": timestamp + "",
+            "x-bi-none": none + "",
+            "Authorization": sign
         },
-        body : {
+        body: {
             image1: {
-                "content_type" : req.body.primaryBiometricDataFormat.toLowerCase(),
+                "content_type": req.body.primaryBiometricDataFormat.toLowerCase(),
                 data: phexData
             },
             image2: {
-                "content_type" : req.body.secondaryBiometricDataFormat.toLowerCase(),
+                "content_type": req.body.secondaryBiometricDataFormat.toLowerCase(),
                 data: shexData
             }
         },
-        json : true
+        json: true
     }
 
-    return new Promise((resolve,reject) => {
-        logger.debug('Request to External server : '+JSON.stringify(option))
+    return new Promise((resolve, reject) => {
+        logger.debug('Request to External server : ' + JSON.stringify(option))
         rp(option)
             .then(function (body) {
-                logger.debug(' Response form External server : '+JSON.stringify(body))
+                logger.debug(' Response form External server : ' + JSON.stringify(body))
                 resolve(body)
             })
             .catch(function (err) {
@@ -256,9 +279,11 @@ const verification = (req,logger)=>{
     })
 }
 
-thaiIdValidator = (id) =>{
-    if(id.length != 13) return false;
-    for(i=0, sum=0; i < 12; i++)
-        sum += parseFloat(id.charAt(i))*(13-i); if((11-sum%11)%10!=parseFloat(id.charAt(12)))
-        return false; return true;
+thaiIdValidator = (id) => {
+    if (id.length != 13) return false;
+    for (i = 0, sum = 0; i < 12; i++)
+        sum += parseFloat(id.charAt(i)) * (13 - i);
+    if ((11 - sum % 11) % 10 != parseFloat(id.charAt(12)))
+        return false;
+    return true;
 };

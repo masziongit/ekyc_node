@@ -114,16 +114,6 @@ exports.oneToOne = (json) => {
         channel: channel
     };
 
-
-    // primaryPhoto.save((err) => {
-    //     if (err) {
-    //         logger.error('Found internal error when saving primary photo for rquid: ' + rquid);
-    //         logger.error(err);
-    //     } else {
-    //         logger.info('Primary photo has been saved for rquid: ' + rquid);
-    //     }
-    // });
-
     // store secondary data
     var secondaryPhotoRefId = uuidv4();
     var secondaryPhoto = {
@@ -138,16 +128,6 @@ exports.oneToOne = (json) => {
         date: currentDate,
         channel: channel
     };
-
-
-    // secondaryPhoto.save((err) => {
-    //     if (err) {
-    //         logger.error('Found internal error when saving secondary photo for rquid: ' + rquid);
-    //         logger.error(err);
-    //     } else {
-    //         logger.info('Secondary photo has been saved for rquid: ' + rquid);
-    //     }
-    // });
 
     // for linux rh
     // send post request
@@ -178,7 +158,6 @@ exports.oneToOne = (json) => {
                 remark: "Internal server error"
             }
         }
-        logger.info(error)
         if (error) {
             logger.error('Found internal error when posting message to BMS server for rquid: ' + rquid);
             logger.error(error);
@@ -234,6 +213,7 @@ exports.oneToOne = (json) => {
                     .catch((err) => {
                         logger.error('Found internal error when saving primary photo for rquid: ' + rquid);
                         logger.error(err);
+                        throw err
                     }).then(() => {
                         logger.info('Primary photo has been saved for rquid: ' + rquid);
                     });
@@ -243,7 +223,7 @@ exports.oneToOne = (json) => {
                     .catch((err) => {
                         logger.error('Found internal error when saving secondary photo for rquid: ' + rquid);
                         logger.error(err);
-
+                        throw err
                     }).then(()=>{
                     logger.info('Secondary photo has been saved for rquid: ' + rquid);
                 });
@@ -274,6 +254,7 @@ exports.oneToOne = (json) => {
                         logger.error(err);
                         res.status(500);
                         res.json(jsonErr)
+                        throw err
                     })
                     .then((rs) => {
                         logger.info('1-to-1 Face verification history has been saved for rquid: ' + rquid);
@@ -290,6 +271,7 @@ exports.oneToOne = (json) => {
                             idp: rs[0].idp
                         };
                         res.send(json);
+                        logger.debug('Received verification response: ' + JSON.stringify(json));
                     });
                 // historyData.save((err) => {
                 //     if (err) {
