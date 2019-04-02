@@ -108,14 +108,15 @@ var availableChannels = ['tmb', 'scb', 'kbank', 'ktc', 'bbl', 'bay', 'uob'];    
 var bmsXmlTemplate;
 
 //load db
-var db = require('./database/dbconnection').db
+var db = require('./database/dbconnection').knex
+
 setInterval(function () {
     db.raw('SELECT 1 FROM DUAL').then(function (resp) {
         console.log(util.dateNow() + ` checking database connection ${JSON.stringify(resp)}`);
     }).catch(err=>{
         logger.error(err)
         throw err
-    });
+    })
 }, 10000);
 
 // load services

@@ -25,6 +25,7 @@
     "mongodb": "^3.0.10",
     "mongoose": "^5.1.4",
     "oracledb": "^2.3.0",
+    "pool2": "^1.4.1",
     "prompt-password": "^1.2.0",
     "request-promise": "^4.2.4",
     "soap": "^0.24.0",

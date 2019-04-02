@@ -1,14 +1,18 @@
 //Oracle knex
 require('dotenv').config()
 var crypto = require('crypto')
-module.exports.db = require('knex')({
+module.exports.knex = require('knex')({
     client: 'oracledb',
+    debug: false,
     connection: {
         "user": process.env.DB_USER,
         "password": decrypt(process.env.DB_PASSWORD),
-        "connectString": process.env.DB_CONNECT_STRING
+        "connectString": process.env.DB_CONNECT_STRING,
     },
-    pool: { min: 2, max:  20 },
+    pool: {
+        min: 2,
+        max: 10
+    },
     fetchAsString: ['number','clob']
 });
 
