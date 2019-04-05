@@ -90,9 +90,9 @@ const verification = (req, logger) => {
             .catch(err => {
                 logger.error('Found internal error when posting message to BMS server for rquid: '
                     + req.body.rquid);
-                logger.error(err)
+                // logger.error(err)
                 reject(jsonErr)
-                throw err;
+                console.log(err)
             });
 
     })

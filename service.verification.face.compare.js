@@ -100,6 +100,8 @@ module.exports = (json) => {
             res.status(500).json(err)
         }).then(bioRes => {
 
+        logger.info(`Liveness pass message : ${bioRes.errormsg}`);
+
         verification(req, logger).then(async body => {
 
             let resultCode

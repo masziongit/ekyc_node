@@ -128,7 +128,7 @@ module.exports = (json) => {
             };
             res.send(json);
         } else {
-            logger.info('Found verification history for rquid: ' + documents.length);
+            logger.info('Found verification history for rquid: ' + rquid);
 
             if (documents.length > 1) {
                 let results = []
@@ -244,7 +244,7 @@ checkOverwrite = (logger, mongoose, overwriteByDataSchema, rquid, documentId, do
 };
 
 successResponse = (logger, rquid, successStatus, documentId, document) => {
-    logger.debug(util.dateNow() + "Before response - " + JSON.stringify(document));
+    logger.debug("Before response - " + JSON.stringify(document));
     return {
         rquid: rquid,
         statusCode: successStatus,

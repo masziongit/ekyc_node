@@ -32,7 +32,7 @@ module.exports = (json) => {
     // request message validation
     let errorRemark = null;
     let condition;
-    logger.info(util.dateNow() + " biometricRefId " + biometricRefId)
+    logger.debug(util.dateNow() + " biometricRefId " + biometricRefId)
     if (util.isUndefineNullBlank(rquid)) {
         logger.info('Bad request, no rquid');
         errorRemark = "Missing rquid";
@@ -83,7 +83,7 @@ module.exports = (json) => {
         condition = { biometricRefId: biometricRefId }
     }
 
-    logger.info(condition)
+    logger.debug(condition)
 
     // query biometric data
     db('biometricData')

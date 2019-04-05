@@ -138,11 +138,7 @@ exports.oneToOne = (json) => {
         url: necFaceVerificationUrl,
         body: bmsXmlTemplate.html(),
     }, async (error, response, body) => {
-        logger.info('Response from BMS for rquid: ' + rquid + " --> " + body);
-        var jsonErr = {}
-        var xmlResponse = cheerio.load(body, {
-            xmlMode: true
-        });
+
         var jsonErr = {
             rquid: rquid,
             statusCode: errorStatus,
@@ -150,6 +146,20 @@ exports.oneToOne = (json) => {
             remark: "Internal server error"
 
         }
+
+        if (error){
+            logger.error('Found internal error when process a response from BMS server for rquid: ' + rquid);
+            logger.error(error);
+            res.status(500).json(jsonErr);
+            throw error
+        }
+
+        logger.info('Response from BMS for rquid: ' + rquid + " --> " + body);
+
+        var xmlResponse = cheerio.load(body, {
+            xmlMode: true
+        });
+
         if (xmlResponse('StatusCode').text() != "000") {
             jsonErr = {
                 rquid: rquid,

@@ -41,7 +41,7 @@ module.exports =  (json) => {
         url: necFaceVerificationUrl,
         body: ldsXmlTemplate,
     },(error, response, body) => {
-        logger.info('Response from LDS for rquid: ' + rquid + " --> " + body);
+        logger.debug('Response from LDS for rquid: ' + rquid + " --> " + body);
         if (error){
             logger.error('Found internal error when posting message to LDS server for rquid: ' + rquid);
             logger.error(error);
