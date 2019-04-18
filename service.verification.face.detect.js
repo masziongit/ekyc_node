@@ -67,9 +67,8 @@ const verification = (req, logger) => {
         },
         body: req.body,
         json: true,
-        rejectUnauthorized: true,
         agentOptions: {
-            ca: fs.readFileSync("./server.cert.pem")
+            ca: fs.readFileSync("./certt.cer")
         }
     }
 
@@ -90,9 +89,9 @@ const verification = (req, logger) => {
             .catch(err => {
                 logger.error('Found internal error when posting message to BMS server for rquid: '
                     + req.body.rquid);
-                // logger.error(err)
+                logger.error(err)
                 reject(jsonErr)
-                console.log(err)
+                // console.log(err)
             });
 
     })

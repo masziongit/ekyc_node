@@ -10,8 +10,10 @@ module.exports.knex = require('knex')({
         "connectString": process.env.DB_CONNECT_STRING,
     },
     pool: {
-        min: 2,
-        max: 10
+        acquireTimeout: 2000,
+        requestTimeout: 5000,
+        syncInterval: 2000,
+        min: 1
     },
     fetchAsString: ['number','clob']
 });

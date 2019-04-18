@@ -115,9 +115,9 @@ setInterval(function () {
         console.log(util.dateNow() + ` checking database connection ${JSON.stringify(resp)}`);
     }).catch(err=>{
         logger.error(err)
-        throw err
+        process.exit(1)
     })
-}, 10000);
+},10000);
 
 // load services
 var service = {};
@@ -216,7 +216,7 @@ app.post('/BMSWebservice72/BMS_WebService.asmx', (req, res) => {
 });
 
 app.post('/passport_verification', (req, res) => {
-    logger.info(util.dateNow() + ' pp ver ' + req.body)
+    logger.debug(util.dateNow() + ' pp ver ' + JSON.stringify(req.body))
     res.contentType('application/xml');
     res.sendFile(path.join(__dirname, 'sampleMessages', 'bms_responsePayload.xml'));
 

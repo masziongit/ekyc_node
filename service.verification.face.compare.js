@@ -88,7 +88,7 @@ module.exports = (json) => {
             documentId: secondaryPhoto.documentId,
             image: {
                 app_id: "com.paic.xface - TWDW",
-                "content-type": secondaryPhoto.biometricDataFormat,
+                "content_type": secondaryPhoto.biometricDataFormat,
                 data: secondaryPhoto.biometricData
             }
         }

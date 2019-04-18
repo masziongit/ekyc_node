@@ -70,7 +70,7 @@ module.exports =  (json) => {
                 });
 
             }catch (err) {
-                console.log(err)
+                // console.log(err)
                 logger.error('Found internal error when process a response from LDS server for rquid: ' + rquid);
                 logger.error(err);
                 res.status(500);
