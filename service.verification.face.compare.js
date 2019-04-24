@@ -111,14 +111,29 @@ module.exports = (json) => {
 
             numTotalScore = (bioRes.errorcode == '0')?numTotalScore : 0
 
-            if (thaiIdValidator(req.body.documentId)) {
-                // if CID
-                logger.info("ID provided for verification is CID, rquid: " + rquid);
-                if (numTotalScore >= 6000) {
+            // if (thaiIdValidator(req.body.documentId)) {
+            //     // if CID
+            //     logger.info("ID provided for verification is CID, rquid: " + rquid);
+            //     if (numTotalScore >= 6000) {
+            //         resultCode = "1";
+            //         resultDesc = "Pass";
+            //         idp = "0";
+            //     } else if (numTotalScore >= 3000 && numTotalScore < 6000) {
+            //         resultCode = "0";
+            //         resultDesc = "Pass with condition";
+            //         idp = "1";
+            //     } else {
+            //         resultCode = "-1";
+            //         resultDesc = "Fail";
+            //         idp = "0";
+            //     }
+            // } else {
+            logger.info("ID provided for verification is CID, rquid: " + rquid);
+                if (numTotalScore >= 7500) {
                     resultCode = "1";
                     resultDesc = "Pass";
                     idp = "0";
-                } else if (numTotalScore >= 3000 && numTotalScore < 6000) {
+                } else if (numTotalScore >= 3500 && numTotalScore < 7500) {
                     resultCode = "0";
                     resultDesc = "Pass with condition";
                     idp = "1";
@@ -127,21 +142,7 @@ module.exports = (json) => {
                     resultDesc = "Fail";
                     idp = "0";
                 }
-            } else {
-                if (numTotalScore >= 6500) {
-                    resultCode = "1";
-                    resultDesc = "Pass";
-                    idp = "0";
-                } else if (numTotalScore >= 3500 && numTotalScore < 6500) {
-                    resultCode = "0";
-                    resultDesc = "Pass with condition";
-                    idp = "1";
-                } else {
-                    resultCode = "-1";
-                    resultDesc = "Fail";
-                    idp = "0";
-                }
-            }
+            // }
 
             // record 1-to-1 verification
             let verificationRefId = uuidv4();

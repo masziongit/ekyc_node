@@ -68,7 +68,7 @@ const verification = (req, logger) => {
         body: req.body,
         json: true,
         agentOptions: {
-            ca: fs.readFileSync("./certt.cer")
+             ca: fs.readFileSync("./certt.cer")
         }
     }
 
