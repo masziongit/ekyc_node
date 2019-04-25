@@ -129,11 +129,11 @@ module.exports = (json) => {
             //     }
             // } else {
             logger.info("ID provided for verification is CID, rquid: " + rquid);
-                if (numTotalScore >= 7500) {
+                if (numTotalScore >= 7000) {
                     resultCode = "1";
                     resultDesc = "Pass";
                     idp = "0";
-                } else if (numTotalScore >= 3500 && numTotalScore < 7500) {
+                } else if (numTotalScore >= 3500 && numTotalScore < 7000) {
                     resultCode = "0";
                     resultDesc = "Pass with condition";
                     idp = "1";
