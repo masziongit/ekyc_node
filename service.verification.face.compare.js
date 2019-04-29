@@ -82,10 +82,6 @@ module.exports = async(json) => {
     primaryPhoto.biometricData = await cryptoData(rquid,primaryPhoto.biometricData,'encrypt',logger)
     secondaryPhoto.biometricData = await cryptoData(rquid,secondaryPhoto.biometricData,'encrypt',logger)
 
-
-    logger.debug(primaryPhoto.biometricData)
-    logger.debug(secondaryPhoto.biometricData)
-
     const jsonErr = {
         rquid: req.body.rquid,
         statusCode: errorStatus,

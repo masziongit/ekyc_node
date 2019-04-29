@@ -10,6 +10,8 @@ const successStatus = '1000';
 const successButNoDataFoundStatus = '1001';
 const errorStatus = '1999';
 
+const cryptoData = require('./service.data.cryptography')
+
 module.exports = (json) => {
     'use strict';
     var logger = json.logger;
@@ -99,7 +101,7 @@ module.exports = (json) => {
                 remark: "Internal server error"
             });
         })
-        .then((document = []) => {
+        .then(async (document = []) => {
             var json;
             if (document.length == 0) {
                 logger.info('No biometric data found for rquid: ' + rquid);
@@ -129,6 +131,8 @@ module.exports = (json) => {
                     timestamp: document[0].timestamp,
                     channel: document[0].channel
                 };
+
+                json.biometricData = await cryptoData(rquid,json.biometricData,'decrypt',logger)
             }
             res.send(json);
         });
