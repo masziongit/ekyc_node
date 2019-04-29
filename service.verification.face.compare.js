@@ -7,9 +7,12 @@ const errorStatus = '1999';
 const uuidv4 = require('uuid/v4');
 const biodetect = require('./service.verification.biodetect')
 
+
+const cryptoData = require('./service.data.cryptography')
+
 const faceVerificationUrl = process.env.FACE_COMPARE;
 
-module.exports = (json) => {
+module.exports = async(json) => {
 
     let logger = json.logger;
     let req = json.req;
@@ -59,6 +62,8 @@ module.exports = (json) => {
         channel: req.body.channel
     };
 
+
+
     // store secondary data
     let secondaryPhotoRefId = uuidv4();
     let secondaryPhoto = {
@@ -74,6 +79,13 @@ module.exports = (json) => {
         channel: req.body.channel
     };
 
+    primaryPhoto.biometricData = await cryptoData(rquid,primaryPhoto.biometricData,'encrypt',logger)
+    secondaryPhoto.biometricData = await cryptoData(rquid,secondaryPhoto.biometricData,'encrypt',logger)
+
+
+    logger.debug(primaryPhoto.biometricData)
+    logger.debug(secondaryPhoto.biometricData)
+
     const jsonErr = {
         rquid: req.body.rquid,
         statusCode: errorStatus,
@@ -85,11 +97,11 @@ module.exports = (json) => {
     let bioInput = {
         body:{
             rquid: rquid,
-            documentId: secondaryPhoto.documentId,
+            documentId: req.body.documentId,
             image: {
                 app_id: "com.paic.xface - TWDW",
-                "content_type": secondaryPhoto.biometricDataFormat,
-                data: secondaryPhoto.biometricData
+                "content_type": req.body.secondaryBiometricDataFormat.toLowerCase(),
+                data: req.body.secondaryBiometricData
             }
         }
     }
