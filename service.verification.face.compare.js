@@ -7,8 +7,8 @@ const errorStatus = '1999';
 const uuidv4 = require('uuid/v4');
 const biodetect = require('./service.verification.biodetect')
 
-
 const cryptoData = require('./service.data.cryptography')
+const cryptoMode = 'encrypt'
 
 const faceVerificationUrl = process.env.FACE_COMPARE;
 
@@ -79,8 +79,8 @@ module.exports = async(json) => {
         channel: req.body.channel
     };
 
-    primaryPhoto.biometricData = await cryptoData(rquid,primaryPhoto.biometricData,'encrypt',logger)
-    secondaryPhoto.biometricData = await cryptoData(rquid,secondaryPhoto.biometricData,'encrypt',logger)
+    primaryPhoto.biometricData = await cryptoData(rquid,primaryPhoto.biometricData,cryptoMode,logger)
+    secondaryPhoto.biometricData = await cryptoData(rquid,secondaryPhoto.biometricData,cryptoMode,logger)
 
     const jsonErr = {
         rquid: req.body.rquid,

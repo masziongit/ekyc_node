@@ -23,7 +23,7 @@ module.exports = (rquid,data,mode,logger)=>{
     body.data = data
 
     let cryUri
-    
+
     if (mode == "decrypt"){
         cryUri = cryptoHost+"/decrypt"
     }else if (mode == "encrypt") {

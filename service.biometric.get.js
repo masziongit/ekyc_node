@@ -11,6 +11,7 @@ const successButNoDataFoundStatus = '1001';
 const errorStatus = '1999';
 
 const cryptoData = require('./service.data.cryptography')
+const cryptoMode = 'decrypt'
 
 module.exports = (json) => {
     'use strict';
@@ -132,7 +133,7 @@ module.exports = (json) => {
                     channel: document[0].channel
                 };
 
-                json.biometricData = await cryptoData(rquid,json.biometricData,'decrypt',logger)
+                json.biometricData = await cryptoData(rquid,json.biometricData,cryptoMode,logger)
             }
             res.send(json);
         });

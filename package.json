@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "create": "node ./database/create_table.js"
+    "create": "node ./database/create_table.js",
+    "crypto_data": "node ./script/crypt_all_data.js"
   },
   "keywords": [
     "TMB",
