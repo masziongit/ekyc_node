@@ -96,6 +96,7 @@ module.exports = async(json) => {
             documentId: req.body.documentId,
             image: {
                 app_id: "com.paic.xface - TWDW",
+                // "content-type": req.body.secondaryBiometricDataFormat.toLowerCase(),
                 "content_type": req.body.secondaryBiometricDataFormat.toLowerCase(),
                 data: req.body.secondaryBiometricData
             }
@@ -108,7 +109,8 @@ module.exports = async(json) => {
             res.status(500).json(err)
         }).then(bioRes => {
 
-        logger.info(`Liveness pass message : ${bioRes.errormsg}`);
+        // logger.info(`Liveness pass message : ${bioRes.errormsg}`);
+        logger.info(`Liveness pass message : ${bioRes.errorMsg}`);
 
         verification(req, logger).then(async body => {
 
@@ -117,25 +119,9 @@ module.exports = async(json) => {
             let resultDesc
             let idp
 
-            numTotalScore = (bioRes.errorcode == '0')?numTotalScore : 0
+            // numTotalScore = (bioRes.errorcode == '0')?numTotalScore : 0
+            numTotalScore = (bioRes.errorCode == '0')?numTotalScore : 0
 
-            // if (thaiIdValidator(req.body.documentId)) {
-            //     // if CID
-            //     logger.info("ID provided for verification is CID, rquid: " + rquid);
-            //     if (numTotalScore >= 6000) {
-            //         resultCode = "1";
-            //         resultDesc = "Pass";
-            //         idp = "0";
-            //     } else if (numTotalScore >= 3000 && numTotalScore < 6000) {
-            //         resultCode = "0";
-            //         resultDesc = "Pass with condition";
-            //         idp = "1";
-            //     } else {
-            //         resultCode = "-1";
-            //         resultDesc = "Fail";
-            //         idp = "0";
-            //     }
-            // } else {
             logger.info("ID provided for verification is CID, rquid: " + rquid);
                 if (numTotalScore >= 7000) {
                     resultCode = "1";

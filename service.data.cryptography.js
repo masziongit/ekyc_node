@@ -1,21 +1,22 @@
 
 let rp = require('request-promise');
 
-const cryptoHost = process.env.CRYPTO_HOST
+const encrypt = process.env.CRYPTO_HOST_ENCRYPT
+const decrypt = process.env.CRYPTO_HOST_DECRYPT
 
 let body = {
-    // algorithm:process.env.ALGORITHM,
-    // transformation:process.env.TRANSFORMATION,
-    // partition:process.env.PARTITION,
-    // alias:process.env.ALIAS,
-    // passPartition:process.env.PASS_PARTITION
+    algorithm:process.env.ALGORITHM,
+    transformation:process.env.TRANSFORMATION,
+    partition:process.env.PARTITION,
+    alias:process.env.ALIAS,
+    passPartition:process.env.PASS_PARTITION
 
     //mock
-    "algorithm":"AES",
-    "transformation":"AES/CBC/PKCS5Padding",
-    "partition":0,
-    "alias:process":"A1",
-    "passPartition":"P@ssw0rd"
+    // "algorithm":"AES",
+    // "transformation":"AES/CBC/PKCS5Padding",
+    // "partition":0,
+    // "alias":"A1",
+    // "passPartition":"P@ssw0rd"
 }
 
 module.exports = (rquid,data,mode,logger)=>{
@@ -25,9 +26,9 @@ module.exports = (rquid,data,mode,logger)=>{
     let cryUri
 
     if (mode == "decrypt"){
-        cryUri = cryptoHost+"/decrypt"
+        cryUri = decrypt
     }else if (mode == "encrypt") {
-        cryUri = cryptoHost+"/encrypt"
+        cryUri = encrypt
     }
 
     let option = {

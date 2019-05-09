@@ -15,7 +15,10 @@ const verificationMethod = 'face';
 const successStatus = '1000';
 const errorStatus = '1999';
 
-exports.oneToOne = (json) => {
+const cryptoData = require('./service.data.cryptography')
+const cryptoMode = 'encrypt'
+
+exports.oneToOne = async (json) => {
     'use strict';
     var logger = json.logger;
     var req = json.req;
@@ -128,6 +131,9 @@ exports.oneToOne = (json) => {
         date: currentDate,
         channel: channel
     };
+
+    primaryPhoto.biometricData = await cryptoData(rquid,primaryPhoto.biometricData,cryptoMode,logger)
+    secondaryPhoto.biometricData = await cryptoData(rquid,secondaryPhoto.biometricData,cryptoMode,logger)
 
     // for linux rh
     // send post request
