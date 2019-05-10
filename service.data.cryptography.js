@@ -10,7 +10,6 @@ let body = {
     partition:process.env.PARTITION,
     alias:process.env.ALIAS,
     passPartition:process.env.PASS_PARTITION
-
     //mock
     // "algorithm":"AES",
     // "transformation":"AES/CBC/PKCS5Padding",
