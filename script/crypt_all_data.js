@@ -10,7 +10,7 @@ require('winston-daily-rotate-file');
 let transports = []
 
 var transport = new (winston.transports.DailyRotateFile)({
-    filename: './migrating-%DATE%.log',
+    filename: '../logs/migrating/migrating-%DATE%.log',
     //datePattern: 'YYYY-MM-DD-HH',
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
@@ -48,10 +48,10 @@ var logger = winston.createLogger({
 });
 
 const select = db('biometricData').orderBy('timestamp', 'desc')
-    .limit(5)
+    .limit(10)
     .whereNull('ISENCRYPTED')
 
-logger.debug(select.toString())
+logger.debug('SQL : '+select.toString())
 
 select
     .catch((err) => {
@@ -80,7 +80,7 @@ select
                 .where({biometricRefId:d.id,ISENCRYPTED:null})
                 .update({biometricData: d.data,ISENCRYPTED:1},['biometricRefId'])
 
-            logger.debug(update.toString())
+            logger.debug('SQL : '+update.toString())
 
             await update
                 .catch(err=>{
