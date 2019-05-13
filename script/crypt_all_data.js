@@ -19,7 +19,7 @@ var transport = new (winston.transports.DailyRotateFile)({
     //datePattern: 'YYYY-MM-DD-HH',
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
-    maxSize: '20m',
+    maxSize: '500m',
     maxFiles: '30d',
     json: true,
     stringify: (obj) => JSON.stringify(obj),
