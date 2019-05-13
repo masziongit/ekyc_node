@@ -145,9 +145,6 @@ async function loopMigration() {
     process.exit(0)
 }
 
-
-
-
 loopMigration()
 
 
