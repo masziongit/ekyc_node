@@ -160,7 +160,7 @@ exports.oneToOne = async (json) => {
             throw error
         }
 
-        logger.info('Response from BMS for rquid: ' + rquid + " --> " + body);
+        logger.debug('Response from BMS for rquid: ' + rquid + " --> " + body);
 
         var xmlResponse = cheerio.load(body, {
             xmlMode: true
