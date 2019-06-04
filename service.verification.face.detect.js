@@ -67,8 +67,14 @@ const verification = (req, logger) => {
         },
         body: req.body,
         json: true,
+
+        ca: fs.readFileSync('./certs/tmb-root-ca.cer'),
+        cert: fs.readFileSync('./certs/ekyc.cer'),
+        key: fs.readFileSync('./certs/ekyc.key'),
+
+        securityOptions: 'SSL_OP_NO_SSLv3',
         agentOptions: {
-             ca: fs.readFileSync("./certt.cer")
+
         }
     }
 

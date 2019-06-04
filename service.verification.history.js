@@ -96,18 +96,7 @@ module.exports = (json) => {
     } else if (all == true) {
         // do nothing
     }
-    query
-        .catch((err) => {
-            logger.error('Internal server error for rquid: ' + rquid);
-            logger.error(err.toString());
-            res.status(500);
-            res.json({
-                rquid: rquid,
-                statusCode: errorStatus,
-                statusDesc: "Error",
-                remark: "Internal server error"
-            });
-        }).then((documents) => {
+    query.then((documents=[]) => {
         if (documents.length == 0) {
             logger.info('No verification history found for rquid: ' + rquid);
             var json = {
@@ -140,10 +129,17 @@ module.exports = (json) => {
                 let json = successResponse(logger, rquid, successStatus, documentId, documents[0])
                 res.send(json)
             }
-
-
-
         }
+    }).catch((err) => {
+        logger.error('Internal server error for rquid: ' + rquid);
+        logger.error(err.toString());
+        res.status(500);
+        res.json({
+            rquid: rquid,
+            statusCode: errorStatus,
+            statusDesc: "Error",
+            remark: "Internal server error"
+        });
     })
     // var VerificationHistoryData = mongoose.model("VerificationHistoryData", verificationHistoryDataSchema);
     // VerificationHistoryData.

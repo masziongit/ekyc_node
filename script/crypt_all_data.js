@@ -130,12 +130,6 @@ async function loopMigration() {
         logger.info(`Alter SQL : ${alter.toString()}`)
     }).catch(async(err)=>{
         logger.error(err)
-        await drop.then(()=>{
-            logger.info(`Drop SQL : ${drop.toString()}`)
-            db.commit
-        })
-
-        process.exit(0)
     })
 
     while (true){
