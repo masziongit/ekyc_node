@@ -11,6 +11,7 @@ const cryptoData = require('./service.data.cryptography')
 const cryptoMode = 'encrypt'
 
 const faceVerificationUrl = process.env.FACE_COMPARE;
+const valCert = process.env.VAL_CA;
 
 module.exports = async(json) => {
 
@@ -256,7 +257,10 @@ const verification = (req, logger) => {
                 data: shexData
             }
         },
-        json: true
+        json: true,
+        agentOptions: {
+            ca: fs.readFileSync(valCert)
+        }
     }
 
     return new Promise((resolve, reject) => {

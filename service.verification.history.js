@@ -97,6 +97,7 @@ module.exports = (json) => {
         // do nothing
     }
     query.then((documents=[]) => {
+
         if (documents.length == 0) {
             logger.info('No verification history found for rquid: ' + rquid);
             var json = {

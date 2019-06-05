@@ -137,6 +137,8 @@ exports.oneToOne = async (json) => {
 
     // for linux rh
     // send post request
+    logger.debug('Request from BMS for rquid: ' + rquid + " --> " + bmsXmlTemplate.html());
+
     request.post({
         headers: {
             'content-type': contentTypeTextXml

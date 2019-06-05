@@ -5,6 +5,7 @@ const util = require('./util.js');
 const errorStatus = '1999';
 
 const faceVerificationUrl = process.env.FACE_DETECT;
+const valCert = process.env.VAL_CA;
 
 module.exports = (json) => {
 
@@ -67,14 +68,8 @@ const verification = (req, logger) => {
         },
         body: req.body,
         json: true,
-
-        ca: fs.readFileSync('./certs/tmb-root-ca.cer'),
-        cert: fs.readFileSync('./certs/ekyc.cer'),
-        key: fs.readFileSync('./certs/ekyc.key'),
-
-        securityOptions: 'SSL_OP_NO_SSLv3',
         agentOptions: {
-
+            ca: fs.readFileSync(valCert)
         }
     }
 
@@ -97,7 +92,6 @@ const verification = (req, logger) => {
                     + req.body.rquid);
                 logger.error(err)
                 reject(jsonErr)
-                // console.log(err)
             });
 
     })

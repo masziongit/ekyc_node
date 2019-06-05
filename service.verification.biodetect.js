@@ -5,6 +5,7 @@ const util = require('./util.js');
 const errorStatus = '1999';
 
 const faceVerificationUrl = process.env.BIODETECT;
+const valCert = process.env.VAL_CA;
 
 module.exports = (json) => {
 
@@ -66,7 +67,10 @@ const verification = module.exports.verification = (req,logger)=>{
             "Authorization" : sign
         },
         body : req.body,
-        json : true
+        json : true,
+        agentOptions: {
+            ca: fs.readFileSync(valCert)
+        }
     }
 
     const jsonErr = {
