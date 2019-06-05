@@ -3,6 +3,8 @@ let rp = require('request-promise');
 
 const encrypt = process.env.CRYPTO_HOST_ENCRYPT
 const decrypt = process.env.CRYPTO_HOST_DECRYPT
+const valCa = process.env.VAL_HSM;
+const fs = require('fs');
 
 let body = {
     algorithm:process.env.ALGORITHM,

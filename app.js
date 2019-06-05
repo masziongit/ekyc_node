@@ -235,15 +235,15 @@ var start = () => {
             xmlMode: true
         });
         // start http
-        app.listen(8080, () => {
+        app.listen(process.env.PORT, () => {
             console.log('eKYC HTTP server is running!');
-            logger.info('eKYC HTTP server is running');
+            logger.info('eKYC HTTP server is running port:'+process.env.PORT);
         });
         // start https
         var server = https.createServer(options, app);
-        server.listen(8443, () => {
+        server.listen(process.env.PORTS, () => {
             console.log('eKYC HTTPS server is running!');
-            logger.info('eKYC HTTPS server is running');
+            logger.info('eKYC HTTPS server is running port:'+process.env.PORTS);
         });
     });
 };

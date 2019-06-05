@@ -5,7 +5,8 @@ const util = require('./util.js');
 const errorStatus = '1999';
 
 const faceVerificationUrl = process.env.FACE_DETECT;
-const valCert = process.env.VAL_CA;
+const valCa = process.env.VAL_PINGANN;
+const fs = require('fs');
 
 module.exports = (json) => {
 
@@ -39,7 +40,6 @@ module.exports = (json) => {
 
 }
 
-const fs = require('fs');
 
 const verification = (req, logger) => {
 
@@ -69,7 +69,7 @@ const verification = (req, logger) => {
         body: req.body,
         json: true,
         agentOptions: {
-            ca: fs.readFileSync(valCert)
+            ca: fs.readFileSync(valCa)
         }
     }
 

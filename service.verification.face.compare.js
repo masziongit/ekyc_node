@@ -11,7 +11,8 @@ const cryptoData = require('./service.data.cryptography')
 const cryptoMode = 'encrypt'
 
 const faceVerificationUrl = process.env.FACE_COMPARE;
-const valCert = process.env.VAL_CA;
+const valCa = process.env.VAL_PINGANN;
+const fs = require('fs');
 
 module.exports = async(json) => {
 
@@ -259,7 +260,7 @@ const verification = (req, logger) => {
         },
         json: true,
         agentOptions: {
-            ca: fs.readFileSync(valCert)
+            ca: fs.readFileSync(valCa)
         }
     }
 
