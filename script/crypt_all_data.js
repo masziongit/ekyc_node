@@ -6,7 +6,7 @@ const table = 'biometricData'
 
 let whereVal = mode=='encrypt'?0:1
 let updateVal = mode=='encrypt'?1:0
-let limit = 2
+let limit = 100
 
 // init log
 const winston = require('winston');
